@@ -44,7 +44,7 @@ fn main() {
         _ => {}
     };
     let queue = Queue::new("com.screen_capture.queue", QueueAttribute::Serial);
-    let display_stream = CGDisplayStream::new_with_dispatch_queue(
+    if let Ok(display_stream) = CGDisplayStream::new_with_dispatch_queue(
         display.id,
         output_width,
         output_height,
@@ -52,8 +52,7 @@ fn main() {
         &properties.to_immutable(),
         &queue,
         closure,
-    );
-    if let Ok(display_stream) = display_stream {
+    ) {
         display_stream.start();
         std::thread::sleep(std::time::Duration::from_secs(10));
         display_stream.stop();

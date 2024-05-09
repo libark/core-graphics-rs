@@ -1,8 +1,6 @@
-use std::marker::PhantomData;
-
 use block2::{Block, RcBlock};
 use core_foundation::{
-    base::{CFRelease, CFRetain, CFType, CFTypeID, CFTypeRef, TCFType},
+    base::{CFType, CFTypeID, TCFType},
     dictionary::{CFDictionary, CFDictionaryRef},
     runloop::{CFRunLoopSource, CFRunLoopSourceRef},
     string::{CFString, CFStringRef},
@@ -150,53 +148,13 @@ unsafe impl RefEncode for __CGDisplayStreamUpdate {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Encoding::Struct("CGDisplayStreamUpdate", &[]));
 }
 
-pub struct CGDisplayStream<'a, T = Queue>(CGDisplayStreamRef, PhantomData<&'a T>);
-
-impl<'a, T> Drop for CGDisplayStream<'a, T> {
-    fn drop(&mut self) {
-        unsafe { CFRelease(self.as_CFTypeRef()) }
-    }
+declare_TCFType! {
+    CGDisplayStream, CGDisplayStreamRef
 }
+impl_TCFType!(CGDisplayStream, CGDisplayStreamRef, CGDisplayStreamGetTypeID);
+impl_CFTypeDescription!(CGDisplayStream);
 
-impl<'a, T> TCFType for CGDisplayStream<'a, T>
-where
-    T: 'a,
-{
-    type Ref = CGDisplayStreamRef;
-
-    #[inline]
-    fn as_concrete_TypeRef(&self) -> CGDisplayStreamRef {
-        self.0
-    }
-
-    #[inline]
-    fn as_CFType(&self) -> CFType {
-        unsafe { CFType::wrap_under_get_rule(self.as_CFTypeRef()) }
-    }
-
-    #[inline]
-    fn as_CFTypeRef(&self) -> CFTypeRef {
-        self.as_concrete_TypeRef() as CFTypeRef
-    }
-
-    #[inline]
-    unsafe fn wrap_under_get_rule(reference: CGDisplayStreamRef) -> Self {
-        let reference = CFRetain(reference as CFTypeRef) as CGDisplayStreamRef;
-        TCFType::wrap_under_create_rule(reference)
-    }
-
-    #[inline]
-    unsafe fn wrap_under_create_rule(reference: CGDisplayStreamRef) -> Self {
-        CGDisplayStream(reference, PhantomData)
-    }
-
-    #[inline]
-    fn type_id() -> CFTypeID {
-        unsafe { CGDisplayStreamGetTypeID() }
-    }
-}
-
-impl<'a> CGDisplayStream<'a> {
+impl CGDisplayStream {
     fn new_frame_available_handler<F>(closure: F) -> RcBlock<CGDisplayStreamFrameAvailableHandler>
     where
         F: Fn(CGDisplayStreamFrameStatus, u64, IOSurface, CGDisplayStreamUpdate) + 'static,
@@ -242,9 +200,9 @@ impl<'a> CGDisplayStream<'a> {
         output_height: size_t,
         pixel_format: i32,
         properties: &CFDictionary<CFString, CFType>,
-        queue: &'a Queue,
+        queue: &Queue,
         closure: F,
-    ) -> Result<CGDisplayStream<'a>, ()>
+    ) -> Result<CGDisplayStream, ()>
     where
         F: Fn(CGDisplayStreamFrameStatus, u64, IOSurface, CGDisplayStreamUpdate) + 'static,
     {
