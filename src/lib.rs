@@ -2,7 +2,7 @@
 
 #[macro_use]
 extern crate bitflags;
-extern crate block2;
+extern crate block;
 #[macro_use]
 extern crate cfg_if;
 #[macro_use]

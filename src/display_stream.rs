@@ -1,4 +1,4 @@
-use block2::{Block, RcBlock};
+use block::{Block, ConcreteBlock, RcBlock};
 use core_foundation::{
     base::{CFType, CFTypeID, TCFType},
     dictionary::{CFDictionary, CFDictionaryRef},
@@ -8,7 +8,6 @@ use core_foundation::{
 use dispatch2::{ffi::dispatch_queue_t, Queue};
 use io_surface::{IOSurface, IOSurfaceRef};
 use libc::{c_void, size_t};
-use objc2::encode::{Encode, Encoding, RefEncode};
 
 use crate::{base::CGFloat, display::CGDirectDisplayID, error::CGError, geometry::CGRect};
 
@@ -48,8 +47,7 @@ pub enum CGDisplayStreamFrameStatus {
     Stopped       = 3,
 }
 
-pub type CGDisplayStreamFrameAvailableHandler =
-    dyn Fn(CGDisplayStreamFrameStatus, u64, *const c_void /* IOSurfaceRef */, CGDisplayStreamUpdateRef);
+pub type CGDisplayStreamFrameAvailableHandler = *const Block<(CGDisplayStreamFrameStatus, u64, IOSurfaceRef, CGDisplayStreamUpdateRef), ()>;
 
 extern "C" {
     pub fn CGDisplayStreamUpdateGetTypeID() -> CFTypeID;
@@ -84,7 +82,7 @@ extern "C" {
         outputHeight: size_t,
         pixelFormat: i32,
         properties: CFDictionaryRef,
-        handler: *const Block<CGDisplayStreamFrameAvailableHandler>,
+        handler: CGDisplayStreamFrameAvailableHandler,
     ) -> CGDisplayStreamRef;
     pub fn CGDisplayStreamCreateWithDispatchQueue(
         display: CGDirectDisplayID,
@@ -93,15 +91,11 @@ extern "C" {
         pixelFormat: i32,
         properties: CFDictionaryRef,
         queue: dispatch_queue_t,
-        handler: *const Block<CGDisplayStreamFrameAvailableHandler>,
+        handler: CGDisplayStreamFrameAvailableHandler,
     ) -> CGDisplayStreamRef;
     pub fn CGDisplayStreamStart(stream: CGDisplayStreamRef) -> CGError;
     pub fn CGDisplayStreamStop(stream: CGDisplayStreamRef) -> CGError;
     pub fn CGDisplayStreamGetRunLoopSource(stream: CGDisplayStreamRef) -> CFRunLoopSourceRef;
-}
-
-unsafe impl Encode for CGDisplayStreamFrameStatus {
-    const ENCODING: Encoding = Encoding::Int;
 }
 
 declare_TCFType! {
@@ -144,10 +138,6 @@ impl CGDisplayStreamUpdate {
     }
 }
 
-unsafe impl RefEncode for __CGDisplayStreamUpdate {
-    const ENCODING_REF: Encoding = Encoding::Pointer(&Encoding::Struct("CGDisplayStreamUpdate", &[]));
-}
-
 declare_TCFType! {
     CGDisplayStream, CGDisplayStreamRef
 }
@@ -155,15 +145,24 @@ impl_TCFType!(CGDisplayStream, CGDisplayStreamRef, CGDisplayStreamGetTypeID);
 impl_CFTypeDescription!(CGDisplayStream);
 
 impl CGDisplayStream {
-    fn new_frame_available_handler<F>(closure: F) -> RcBlock<CGDisplayStreamFrameAvailableHandler>
+    fn new_frame_available_handler<F>(closure: F) -> RcBlock<(CGDisplayStreamFrameStatus, u64, IOSurfaceRef, CGDisplayStreamUpdateRef), ()>
     where
-        F: Fn(CGDisplayStreamFrameStatus, u64, IOSurface, CGDisplayStreamUpdate) + 'static,
+        F: Fn(CGDisplayStreamFrameStatus, u64, Option<IOSurface>, Option<CGDisplayStreamUpdate>) + 'static,
     {
-        RcBlock::new(move |status: CGDisplayStreamFrameStatus, timestamp: u64, surface: *const c_void, update: CGDisplayStreamUpdateRef| {
-            let surface = unsafe { IOSurface::wrap_under_get_rule(surface as IOSurfaceRef) };
-            let update = unsafe { CGDisplayStreamUpdate::wrap_under_get_rule(update as CGDisplayStreamUpdateRef) };
+        ConcreteBlock::new(move |status: CGDisplayStreamFrameStatus, timestamp: u64, surface: IOSurfaceRef, update: CGDisplayStreamUpdateRef| {
+            let surface = if surface.is_null() {
+                None
+            } else {
+                Some(unsafe { IOSurface::wrap_under_get_rule(surface as IOSurfaceRef) })
+            };
+            let update = if update.is_null() {
+                None
+            } else {
+                Some(unsafe { CGDisplayStreamUpdate::wrap_under_get_rule(update as CGDisplayStreamUpdateRef) })
+            };
             closure(status, timestamp, surface, update);
         })
+        .copy()
     }
 
     pub fn new<F>(
@@ -175,7 +174,7 @@ impl CGDisplayStream {
         closure: F,
     ) -> Result<CGDisplayStream, ()>
     where
-        F: Fn(CGDisplayStreamFrameStatus, u64, IOSurface, CGDisplayStreamUpdate) + 'static,
+        F: Fn(CGDisplayStreamFrameStatus, u64, Option<IOSurface>, Option<CGDisplayStreamUpdate>) + 'static,
     {
         let stream = unsafe {
             CGDisplayStreamCreate(
@@ -204,7 +203,7 @@ impl CGDisplayStream {
         closure: F,
     ) -> Result<CGDisplayStream, ()>
     where
-        F: Fn(CGDisplayStreamFrameStatus, u64, IOSurface, CGDisplayStreamUpdate) + 'static,
+        F: Fn(CGDisplayStreamFrameStatus, u64, Option<IOSurface>, Option<CGDisplayStreamUpdate>) + 'static,
     {
         let stream = unsafe {
             CGDisplayStreamCreateWithDispatchQueue(

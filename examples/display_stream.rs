@@ -27,22 +27,27 @@ fn main() {
     properties.add(&CGDisplayStreamProperties::MinimumFrameTime.into(), &CFNumber::from(1.0 / 60.0).as_CFType());
     let ycbcr_matrix: CFString = CGDisplayStreamYCbCrMatrices::ITU_R_709_2.into();
     properties.add(&CGDisplayStreamProperties::YCbCrMatrix.into(), &ycbcr_matrix.as_CFType());
-    let closure = move |status: CGDisplayStreamFrameStatus, timestamp: u64, surface: IOSurface, update: CGDisplayStreamUpdate| match status {
-        CGDisplayStreamFrameStatus::Stopped => {
-            println!("status: Stopped");
-        }
-        CGDisplayStreamFrameStatus::FrameComplete => {
-            println!("status: {:?}, timestamp: {}", status, timestamp);
-            println!("refreshed rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::RefreshedRects));
-            println!("moved rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::MovedRects));
-            println!("dirty rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::DirtyRects));
-            println!("reduced dirty rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::ReducedDirtyRects));
-            if let Ok(pixel_buffer) = CVPixelBuffer::from_io_surface(&surface, None) {
-                println!("pixel_buffer: {:?}", pixel_buffer);
+    let closure =
+        move |status: CGDisplayStreamFrameStatus, timestamp: u64, surface: Option<IOSurface>, update: Option<CGDisplayStreamUpdate>| match status {
+            CGDisplayStreamFrameStatus::Stopped => {
+                println!("status: Stopped");
             }
-        }
-        _ => {}
-    };
+            CGDisplayStreamFrameStatus::FrameComplete => {
+                println!("status: {:?}, timestamp: {}", status, timestamp);
+                if let Some(update) = update {
+                    println!("refreshed rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::RefreshedRects));
+                    println!("moved rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::MovedRects));
+                    println!("dirty rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::DirtyRects));
+                    println!("reduced dirty rects: {:?}", update.rects(CGDisplayStreamUpdateRectType::ReducedDirtyRects));
+                }
+                if let Some(surface) = surface {
+                    if let Ok(pixel_buffer) = CVPixelBuffer::from_io_surface(&surface, None) {
+                        println!("pixel_buffer: {:?}", pixel_buffer);
+                    }
+                }
+            }
+            _ => {}
+        };
     let queue = Queue::new("com.screen_capture.queue", QueueAttribute::Serial);
     if let Ok(display_stream) = CGDisplayStream::new_with_dispatch_queue(
         display.id,
