@@ -20,97 +20,36 @@ pub struct __CGImage(c_void);
 
 pub type CGImageRef = *mut __CGImage;
 
-#[repr(u32)]
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum CGImageAlphaInfo {
-    #[doc(alias = "kCGImageAlphaNone")]
-    AlphaNone,
-    #[doc(alias = "kCGImageAlphaPremultipliedLast")]
-    AlphaPremultipliedLast,
-    #[doc(alias = "kCGImageAlphaPremultipliedFirst")]
-    AlphaPremultipliedFirst,
-    #[doc(alias = "kCGImageAlphaLast")]
-    AlphaLast,
-    #[doc(alias = "kCGImageAlphaFirst")]
-    AlphaFirst,
-    #[doc(alias = "kCGImageAlphaNoneSkipLast")]
-    AlphaNoneSkipLast,
-    #[doc(alias = "kCGImageAlphaNoneSkipFirst")]
-    AlphaNoneSkipFirst,
-    #[doc(alias = "kCGImageAlphaOnly")]
-    AlphaOnly,
-}
+pub const kCGImageAlphaNone: u32 = 0;
+pub const kCGImageAlphaPremultipliedLast: u32 = 1;
+pub const kCGImageAlphaPremultipliedFirst: u32 = 2;
+pub const kCGImageAlphaLast: u32 = 3;
+pub const kCGImageAlphaFirst: u32 = 4;
+pub const kCGImageAlphaNoneSkipLast: u32 = 5;
+pub const kCGImageAlphaNoneSkipFirst: u32 = 6;
+pub const kCGImageAlphaOnly: u32 = 7;
 
-#[repr(u32)]
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum CGImageByteOrderInfo {
-    #[doc(alias = "kCGImageByteOrderMask")]
-    ByteOrderMask     = 0x7000,
-    #[doc(alias = "kCGImageByteOrderDefault")]
-    ByteOrderDefault  = 0 << 12,
-    #[doc(alias = "kCGImageByteOrder16Little")]
-    ByteOrder16Little = 1 << 12,
-    #[doc(alias = "kCGImageByteOrder32Little")]
-    ByteOrder32Little = 2 << 12,
-    #[doc(alias = "kCGImageByteOrder16Big")]
-    ByteOrder16Big    = 3 << 12,
-    #[doc(alias = "kCGImageByteOrder32Big")]
-    ByteOrder32Big    = 4 << 12,
-}
+pub const kCGImageByteOrderMask: u32 = 0x7000;
+pub const kCGImageByteOrderDefault: u32 = 0 << 12;
+pub const kCGImageByteOrder16Little: u32 = 1 << 12;
+pub const kCGImageByteOrder32Little: u32 = 2 << 12;
+pub const kCGImageByteOrder16Big: u32 = 3 << 12;
+pub const kCGImageByteOrder32Big: u32 = 4 << 12;
 
-#[repr(u32)]
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum CGImagePixelFormatInfo {
-    #[doc(alias = "kCGImagePixelFormatMask")]
-    PixelFormatMask      = 0xF000,
-    #[doc(alias = "kCGImagePixelFormatPacked")]
-    PixelFormatPacked    = 0 << 16,
-    #[doc(alias = "kCGImagePixelFormatRGB")]
-    PixelFormatRGB555    = 1 << 16,
-    #[doc(alias = "kCGImagePixelFormatRGB")]
-    PixelFormatRGB565    = 2 << 16,
-    #[doc(alias = "kCGImagePixelFormatRGB")]
-    PixelFormatRGB101010 = 3 << 16,
-    #[doc(alias = "kCGImagePixelFormatRGB")]
-    PixelFormatRGBCIF10  = 4 << 16,
-}
-
-bitflags! {
-    #[repr(C)]
-    #[derive(Clone, Copy, Debug, Default, PartialEq)]
-    pub struct CGBitmapInfo: u32 {
-        #[doc(alias = "kCGBitmapAlphaInfoMask")]
-        const AlphaInfoMask = 0x1F;
-        #[doc(alias = "kCGBitmapFloatInfoMask")]
-        const FloatInfoMask = 0xF00;
-        #[doc(alias = "kCGBitmapFloatComponents")]
-        const FloatComponents = 1 << 8;
-        #[doc(alias = "kCGBitmapByteOrderMask")]
-        const ByteOrderMask = CGImageByteOrderInfo::ByteOrderMask as u32;
-        #[doc(alias = "kCGBitmapByteOrderDefault")]
-        const ByteOrderDefault = CGImageByteOrderInfo::ByteOrderDefault as u32;
-        #[doc(alias = "kCGBitmapByteOrder16Little")]
-        const ByteOrder16Little = CGImageByteOrderInfo::ByteOrder16Little as u32;
-        #[doc(alias = "kCGBitmapByteOrder32Little")]
-        const ByteOrder32Little = CGImageByteOrderInfo::ByteOrder32Little as u32;
-        #[doc(alias = "kCGBitmapByteOrder16Big")]
-        const ByteOrder16Big = CGImageByteOrderInfo::ByteOrder16Big as u32;
-        #[doc(alias = "kCGBitmapByteOrder32Big")]
-        const ByteOrder32Big = CGImageByteOrderInfo::ByteOrder32Big as u32;
-        #[doc(alias = "kCGBitmapByteOrder16Host")]
-        const ByteOrder16Host = kCGBitmapByteOrder16Host;
-        #[doc(alias = "kCGBitmapByteOrder32Host")]
-        const ByteOrder32Host = kCGBitmapByteOrder32Host;
-    }
-}
+pub const kCGImagePixelFormatMask: u32 = 0xF000;
+pub const kCGImagePixelFormatPacked: u32 = 0 << 16;
+pub const kCGImagePixelFormatRGB555: u32 = 1 << 16;
+pub const kCGImagePixelFormatRGB565: u32 = 2 << 16;
+pub const kCGImagePixelFormatRGB101010: u32 = 3 << 16;
+pub const kCGImagePixelFormatRGBCIF10: u32 = 4 << 16;
 
 cfg_if! {
     if #[cfg(target_endian = "big")] {
-        pub const kCGBitmapByteOrder16Host: u32 = CGImageByteOrderInfo::ByteOrder16Big as u32;
-        pub const kCGBitmapByteOrder32Host: u32 = CGImageByteOrderInfo::ByteOrder32Big as u32;
+        pub const kCGImageByteOrder16Host: u32 = kCGImageByteOrder16Big;
+        pub const kCGImageByteOrder32Host: u32 = kCGImageByteOrder32Big;
     } else {
-        pub const kCGBitmapByteOrder16Host: u32 = CGImageByteOrderInfo::ByteOrder16Little as u32;
-        pub const kCGBitmapByteOrder32Host: u32 = CGImageByteOrderInfo::ByteOrder32Little as u32;
+        pub const kCGImageByteOrder16Host: u32 = kCGImageByteOrder16Little;
+        pub const kCGImageByteOrder32Host: u32 = kCGImageByteOrder32Little;
     }
 }
 
@@ -174,6 +113,104 @@ extern "C" {
     pub fn CGImageGetByteOrderInfo(image: CGImageRef) -> CGImageByteOrderInfo;
     pub fn CGImageGetPixelFormatInfo(image: CGImageRef) -> CGImagePixelFormatInfo;
     pub fn CGImageGetUTType(image: CGImageRef) -> CFStringRef;
+}
+
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CGImageAlphaInfo {
+    #[doc(alias = "kCGImageAlphaNone")]
+    AlphaNone               = kCGImageAlphaNone,
+    #[doc(alias = "kCGImageAlphaPremultipliedLast")]
+    AlphaPremultipliedLast  = kCGImageAlphaPremultipliedLast,
+    #[doc(alias = "kCGImageAlphaPremultipliedFirst")]
+    AlphaPremultipliedFirst = kCGImageAlphaPremultipliedFirst,
+    #[doc(alias = "kCGImageAlphaLast")]
+    AlphaLast               = kCGImageAlphaLast,
+    #[doc(alias = "kCGImageAlphaFirst")]
+    AlphaFirst              = kCGImageAlphaFirst,
+    #[doc(alias = "kCGImageAlphaNoneSkipLast")]
+    AlphaNoneSkipLast       = kCGImageAlphaNoneSkipLast,
+    #[doc(alias = "kCGImageAlphaNoneSkipFirst")]
+    AlphaNoneSkipFirst      = kCGImageAlphaNoneSkipFirst,
+    #[doc(alias = "kCGImageAlphaOnly")]
+    AlphaOnly               = kCGImageAlphaOnly,
+}
+
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CGImageByteOrderInfo {
+    #[doc(alias = "kCGImageByteOrderMask")]
+    ByteOrderMask     = kCGImageByteOrderMask,
+    #[doc(alias = "kCGImageByteOrderDefault")]
+    ByteOrderDefault  = kCGImageByteOrderDefault,
+    #[doc(alias = "kCGImageByteOrder16Little")]
+    ByteOrder16Little = kCGImageByteOrder16Little,
+    #[doc(alias = "kCGImageByteOrder32Little")]
+    ByteOrder32Little = kCGImageByteOrder32Little,
+    #[doc(alias = "kCGImageByteOrder16Big")]
+    ByteOrder16Big    = kCGImageByteOrder16Big,
+    #[doc(alias = "kCGImageByteOrder32Big")]
+    ByteOrder32Big    = kCGImageByteOrder32Big,
+}
+
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CGImagePixelFormatInfo {
+    #[doc(alias = "kCGImagePixelFormatMask")]
+    PixelFormatMask      = kCGImagePixelFormatMask,
+    #[doc(alias = "kCGImagePixelFormatPacked")]
+    PixelFormatPacked    = kCGImagePixelFormatPacked,
+    #[doc(alias = "kCGImagePixelFormatRGB")]
+    PixelFormatRGB555    = kCGImagePixelFormatRGB555,
+    #[doc(alias = "kCGImagePixelFormatRGB")]
+    PixelFormatRGB565    = kCGImagePixelFormatRGB565,
+    #[doc(alias = "kCGImagePixelFormatRGB")]
+    PixelFormatRGB101010 = kCGImagePixelFormatRGB101010,
+    #[doc(alias = "kCGImagePixelFormatRGB")]
+    PixelFormatRGBCIF10  = kCGImagePixelFormatRGBCIF10,
+}
+
+bitflags! {
+    #[repr(C)]
+    #[derive(Clone, Copy, Debug, Default, PartialEq)]
+    pub struct CGBitmapInfo: u32 {
+        #[doc(alias = "kCGBitmapAlphaInfoMask")]
+        const AlphaInfoMask = 0x1F;
+        const AlphaInfoNone = kCGImageAlphaNone;
+        const AlphaInfoPremultipliedLast = kCGImageAlphaPremultipliedLast;
+        const AlphaInfoPremultipliedFirst = kCGImageAlphaPremultipliedFirst;
+        const AlphaInfoLast = kCGImageAlphaLast;
+        const AlphaInfoFirst = kCGImageAlphaFirst;
+        const AlphaInfoNoneSkipLast = kCGImageAlphaNoneSkipLast;
+        const AlphaInfoNoneSkipFirst = kCGImageAlphaNoneSkipFirst;
+        const AlphaInfoOnly = kCGImageAlphaOnly;
+        #[doc(alias = "kCGBitmapFloatInfoMask")]
+        const FloatInfoMask = 0xF00;
+        #[doc(alias = "kCGBitmapFloatComponents")]
+        const FloatComponents = 1 << 8;
+        #[doc(alias = "kCGBitmapByteOrderMask")]
+        const ByteOrderMask = kCGImageByteOrderMask;
+        #[doc(alias = "kCGBitmapByteOrderDefault")]
+        const ByteOrderDefault = kCGImageByteOrderDefault;
+        #[doc(alias = "kCGBitmapByteOrder16Little")]
+        const ByteOrder16Little = kCGImageByteOrder16Little;
+        #[doc(alias = "kCGBitmapByteOrder32Little")]
+        const ByteOrder32Little = kCGImageByteOrder32Little;
+        #[doc(alias = "kCGBitmapByteOrder16Big")]
+        const ByteOrder16Big = kCGImageByteOrder16Big;
+        #[doc(alias = "kCGBitmapByteOrder32Big")]
+        const ByteOrder32Big = kCGImageByteOrder32Big;
+        #[doc(alias = "kCGBitmapByteOrder16Host")]
+        const ByteOrder16Host = kCGImageByteOrder16Host;
+        #[doc(alias = "kCGBitmapByteOrder32Host")]
+        const ByteOrder32Host = kCGImageByteOrder32Host;
+        const PixelFormatMask = kCGImagePixelFormatMask;
+        const PixelFormatPacked = kCGImagePixelFormatPacked;
+        const PixelFormatRGB555 = kCGImagePixelFormatRGB555;
+        const PixelFormatRGB565 = kCGImagePixelFormatRGB565;
+        const PixelFormatRGB101010 = kCGImagePixelFormatRGB101010;
+        const PixelFormatRGBCIF10 = kCGImagePixelFormatRGBCIF10;
+    }
 }
 
 pub struct CGImage(CGImageRef);
