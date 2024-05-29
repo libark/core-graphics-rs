@@ -51,7 +51,7 @@ impl CGColorConversionInfo {
         }
     }
 
-    pub fn create_with_options(
+    pub fn new_with_options(
         src: Option<&CGColorSpace>,
         dst: Option<&CGColorSpace>,
         options: Option<&CFDictionary<CFString, CFType>>,

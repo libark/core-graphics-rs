@@ -40,7 +40,7 @@ impl_TCFType!(CGLayer, CGLayerRef, CGLayerGetTypeID);
 impl_CFTypeDescription!(CGLayer);
 
 impl CGLayer {
-    pub fn create_with_context(context: &CGContext, size: CGSize, auxiliary_info: Option<&CFDictionary<CFString, CFType>>) -> Option<Self> {
+    pub fn new_with_context(context: &CGContext, size: CGSize, auxiliary_info: Option<&CFDictionary<CFString, CFType>>) -> Option<Self> {
         unsafe {
             let layer = CGLayerCreateWithContext(context.as_concrete_TypeRef(), size, auxiliary_info.map_or(null(), |ai| ai.as_concrete_TypeRef()));
             if layer.is_null() {

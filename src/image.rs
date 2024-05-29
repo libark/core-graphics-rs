@@ -176,14 +176,14 @@ bitflags! {
     pub struct CGBitmapInfo: u32 {
         #[doc(alias = "kCGBitmapAlphaInfoMask")]
         const AlphaInfoMask = 0x1F;
-        const AlphaInfoNone = kCGImageAlphaNone;
-        const AlphaInfoPremultipliedLast = kCGImageAlphaPremultipliedLast;
-        const AlphaInfoPremultipliedFirst = kCGImageAlphaPremultipliedFirst;
-        const AlphaInfoLast = kCGImageAlphaLast;
-        const AlphaInfoFirst = kCGImageAlphaFirst;
-        const AlphaInfoNoneSkipLast = kCGImageAlphaNoneSkipLast;
-        const AlphaInfoNoneSkipFirst = kCGImageAlphaNoneSkipFirst;
-        const AlphaInfoOnly = kCGImageAlphaOnly;
+        const AlphaNone = kCGImageAlphaNone;
+        const AlphaPremultipliedLast = kCGImageAlphaPremultipliedLast;
+        const AlphaPremultipliedFirst = kCGImageAlphaPremultipliedFirst;
+        const AlphaLast = kCGImageAlphaLast;
+        const AlphaFirst = kCGImageAlphaFirst;
+        const AlphaNoneSkipLast = kCGImageAlphaNoneSkipLast;
+        const AlphaNoneSkipFirst = kCGImageAlphaNoneSkipFirst;
+        const AlphaOnly = kCGImageAlphaOnly;
         #[doc(alias = "kCGBitmapFloatInfoMask")]
         const FloatInfoMask = 0xF00;
         #[doc(alias = "kCGBitmapFloatComponents")]

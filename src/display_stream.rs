@@ -105,7 +105,7 @@ impl_TCFType!(CGDisplayStreamUpdate, CGDisplayStreamUpdateRef, CGDisplayStreamUp
 impl_CFTypeDescription!(CGDisplayStreamUpdate);
 
 impl CGDisplayStreamUpdate {
-    pub fn create_merged_update(&self, other: &CGDisplayStreamUpdate) -> Result<CGDisplayStreamUpdate, ()> {
+    pub fn new_merged_update(&self, other: &CGDisplayStreamUpdate) -> Result<CGDisplayStreamUpdate, ()> {
         unsafe {
             let update = CGDisplayStreamUpdateCreateMergedUpdate(self.as_concrete_TypeRef(), other.as_concrete_TypeRef());
             if update.is_null() {
