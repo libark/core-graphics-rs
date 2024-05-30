@@ -67,20 +67,20 @@ impl CGAffineTransform {
         unsafe { CGAffineTransformMakeRotation(angle) }
     }
 
-    pub fn from_translate(&self, tx: CGFloat, ty: CGFloat) -> CGAffineTransform {
+    pub fn from_components(components: CGAffineTransformComponents) -> CGAffineTransform {
+        unsafe { CGAffineTransformMakeWithComponents(components) }
+    }
+
+    pub fn translate(&self, tx: CGFloat, ty: CGFloat) -> CGAffineTransform {
         unsafe { CGAffineTransformTranslate(*self, tx, ty) }
     }
 
-    pub fn from_scale(&self, sx: CGFloat, sy: CGFloat) -> CGAffineTransform {
+    pub fn scale(&self, sx: CGFloat, sy: CGFloat) -> CGAffineTransform {
         unsafe { CGAffineTransformScale(*self, sx, sy) }
     }
 
-    pub fn formt_rotate(&self, angle: CGFloat) -> CGAffineTransform {
+    pub fn rotate(&self, angle: CGFloat) -> CGAffineTransform {
         unsafe { CGAffineTransformRotate(*self, angle) }
-    }
-
-    pub fn from_components(components: CGAffineTransformComponents) -> CGAffineTransform {
-        unsafe { CGAffineTransformMakeWithComponents(components) }
     }
 
     pub fn is_identity(&self) -> bool {
