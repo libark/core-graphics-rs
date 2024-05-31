@@ -289,28 +289,6 @@ impl CGImage {
         }
     }
 
-    pub fn new_copy(image: &CGImage) -> Option<Self> {
-        unsafe {
-            let image = CGImageCreateCopy(image.as_concrete_TypeRef());
-            if image.is_null() {
-                None
-            } else {
-                Some(TCFType::wrap_under_create_rule(image))
-            }
-        }
-    }
-
-    pub fn new_copy_with_color_space(image: &CGImage, space: &CGColorSpace) -> Option<Self> {
-        unsafe {
-            let image = CGImageCreateCopyWithColorSpace(image.as_concrete_TypeRef(), space.as_concrete_TypeRef());
-            if image.is_null() {
-                None
-            } else {
-                Some(TCFType::wrap_under_create_rule(image))
-            }
-        }
-    }
-
     pub fn from_jpeg_data_provider(
         provider: &CGDataProvider,
         decode: Option<&[CGFloat]>,
@@ -345,10 +323,9 @@ impl CGImage {
         }
     }
 
-    pub fn from_mask(image: Option<&CGImage>, mask: Option<&CGImage>) -> Option<Self> {
+    pub fn new_copy(&self) -> Option<Self> {
         unsafe {
-            let image =
-                CGImageCreateWithMask(image.map_or(null_mut(), |i| i.as_concrete_TypeRef()), mask.map_or(null_mut(), |m| m.as_concrete_TypeRef()));
+            let image = CGImageCreateCopy(self.as_concrete_TypeRef());
             if image.is_null() {
                 None
             } else {
@@ -357,14 +334,36 @@ impl CGImage {
         }
     }
 
-    pub fn from_masking_colors(image: &CGImage, components: &[CGFloat]) -> Option<Self> {
+    pub fn new_copy_with_color_space(&self, space: &CGColorSpace) -> Option<Self> {
         unsafe {
-            let color_space = image.color_space()?;
+            let image = CGImageCreateCopyWithColorSpace(self.as_concrete_TypeRef(), space.as_concrete_TypeRef());
+            if image.is_null() {
+                None
+            } else {
+                Some(TCFType::wrap_under_create_rule(image))
+            }
+        }
+    }
+
+    pub fn new_with_mask(&self, mask: &CGImage) -> Option<Self> {
+        unsafe {
+            let image = CGImageCreateWithMask(self.as_concrete_TypeRef(), mask.as_concrete_TypeRef());
+            if image.is_null() {
+                None
+            } else {
+                Some(TCFType::wrap_under_create_rule(image))
+            }
+        }
+    }
+
+    pub fn new_with_masking_colors(&self, components: &[CGFloat]) -> Option<Self> {
+        unsafe {
+            let color_space = self.color_space()?;
             let num_components = color_space.number_of_components();
             if components.len() != num_components * 2 {
                 return None;
             }
-            let image = CGImageCreateWithMaskingColors(image.as_concrete_TypeRef(), components.as_ptr());
+            let image = CGImageCreateWithMaskingColors(self.as_concrete_TypeRef(), components.as_ptr());
             if image.is_null() {
                 None
             } else {
@@ -373,9 +372,9 @@ impl CGImage {
         }
     }
 
-    pub fn cropped(image: &CGImage, rect: CGRect) -> Option<Self> {
+    pub fn cropped(&self, rect: CGRect) -> Option<Self> {
         unsafe {
-            let image = CGImageCreateWithImageInRect(image.as_concrete_TypeRef(), rect);
+            let image = CGImageCreateWithImageInRect(self.as_concrete_TypeRef(), rect);
             if image.is_null() {
                 None
             } else {
