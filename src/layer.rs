@@ -74,3 +74,13 @@ impl CGLayer {
         unsafe { CGContextDrawLayerAtPoint(context.as_concrete_TypeRef(), point, self.as_concrete_TypeRef()) }
     }
 }
+
+impl CGContext {
+    pub fn draw_layer_in_rect(&self, layer: &CGLayer, rect: CGRect) {
+        layer.draw_in_rect(self, rect)
+    }
+
+    pub fn draw_layer_at_point(&self, layer: &CGLayer, point: CGPoint) {
+        layer.draw_at_point(self, point)
+    }
+}
